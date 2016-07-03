@@ -5,14 +5,16 @@ using System.Collections;
 
 public class TwitterComponentHandler : MonoBehaviour
 {
-    
+
     public GameObject inputPINField;
     public GameObject inputTweetField;
     public GameObject Text;
+    public float TweetCount = 0.0f;
     public string SearchTag;
 
     private const string CONSUMER_KEY = "PUhRhZcpxbcpd2eUWgjdvxb1N";
     private const string CONSUMER_SECRET = "qb3JPFWXCfEWSM8EVFHbrZHnaDCEOx84YptoXNhsCrTpNDeVES";
+    private bool IsStart;
 
     Twitter.RequestTokenResponse m_RequestTokenResponse;
     Twitter.AccessTokenResponse m_AccessTokenResponse;
@@ -27,21 +29,24 @@ public class TwitterComponentHandler : MonoBehaviour
     // Use this for initialization
     void Start()
     {
-
+        IsStart = false;
     }
 
     // Update is called once per frame
-    void Update () {
-	
-	}
+    void Update()
+    {
+    }
 
 
     public void OnClickSerchByHashTag()
-    { 
-        // ハッシュタグ "#Unity" で検索（終了するとOnSearchTweetsResponseが実行される）
-        StartCoroutine(Twitter.API.SearchTweets(SearchTag, CONSUMER_KEY, CONSUMER_SECRET, m_AccessTokenResponse, OnSearchTweetsResponse));
+    {
+        if (IsStart)
+        {
+            // ハッシュタグ "#Unity" で検索（終了するとOnSearchTweetsResponseが実行される）
+            StartCoroutine(Twitter.API.SearchTweets(SearchTag, CONSUMER_KEY, CONSUMER_SECRET, m_AccessTokenResponse, OnSearchTweetsResponse));
+        }
     }
-         
+
     void OnSearchTweetsResponse(bool success, string response)
     {
         // responseに検索結果のJSON文字列が入ってくるので解析して各ツイートのテキストを得る
@@ -53,17 +58,19 @@ public class TwitterComponentHandler : MonoBehaviour
             JSONObject statuses = json.GetField("statuses");
             JSONObject search_metadata = json.GetField("search_metadata");
             JSONObject count = search_metadata.GetField("count");
+            TweetCount = count.n;
             print(statuses.Count); //取得ツイート数
-            /*
-            for (int i = 0; i < tweets.Length; i++)
-            {
-                print(tweets[i].GetField("text").toString()); //ツイート内容
-                print(tweets[i].GetField("created_at").toString()); //ツイート時間
-            }
-            */
+                                    /*
+                                    for (int i = 0; i < tweets.Length; i++)
+                                    {
+                                        print(tweets[i].GetField("text").toString()); //ツイート内容
+                                        print(tweets[i].GetField("created_at").toString()); //ツイート時間
+                                    }
+                                    */
             Text.GetComponent<Text>().text = response;
         }
-        else {
+        else
+        {
             print("OnSearchTweet - failed.");
         }
     }
@@ -75,6 +82,7 @@ public class TwitterComponentHandler : MonoBehaviour
     {
         StartCoroutine(Twitter.API.GetRequestToken(CONSUMER_KEY, CONSUMER_SECRET,
             new Twitter.RequestTokenCallback(this.OnRequestTokenCallback)));
+        IsStart = true;
     }
 
     public void OnClickAuthPINButon()
@@ -112,7 +120,8 @@ public class TwitterComponentHandler : MonoBehaviour
 
             Twitter.API.OpenAuthorizationPage(response.Token);
         }
-        else {
+        else
+        {
             print("OnRequestTokenCallback - failed.");
         }
     }
@@ -129,14 +138,15 @@ public class TwitterComponentHandler : MonoBehaviour
             print(log);
 
             m_AccessTokenResponse = response;
-            
+
             PlayerPrefs.SetString(PLAYER_PREFS_TWITTER_USER_ID, response.UserId);
             PlayerPrefs.SetString(PLAYER_PREFS_TWITTER_USER_SCREEN_NAME, response.ScreenName);
             PlayerPrefs.SetString(PLAYER_PREFS_TWITTER_USER_TOKEN, response.Token);
             PlayerPrefs.SetString(PLAYER_PREFS_TWITTER_USER_TOKEN_SECRET, response.TokenSecret);
 
         }
-        else {
+        else
+        {
             print("OnAccessTokenCallback - failed.");
         }
     }
