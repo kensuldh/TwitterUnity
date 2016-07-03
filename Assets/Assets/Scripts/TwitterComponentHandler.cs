@@ -5,19 +5,18 @@ using System.Collections;
 
 public class TwitterComponentHandler : MonoBehaviour
 {
-
     public GameObject inputPINField;
     public GameObject inputTweetField;
     public GameObject Text;
-    public float TweetCount = 0.0f;
+    private float TweetCount = 0.0f;
     public string SearchTag;
 
-    private const string CONSUMER_KEY = "PUhRhZcpxbcpd2eUWgjdvxb1N";
-    private const string CONSUMER_SECRET = "qb3JPFWXCfEWSM8EVFHbrZHnaDCEOx84YptoXNhsCrTpNDeVES";
-    private bool IsStart;
+    private string CONSUMER_KEY = "PUhRhZcpxbcpd2eUWgjdvxb1N";
+    private string CONSUMER_SECRET = "qb3JPFWXCfEWSM8EVFHbrZHnaDCEOx84YptoXNhsCrTpNDeVES";
+    private int condition = 0;
 
-    Twitter.RequestTokenResponse m_RequestTokenResponse;
-    Twitter.AccessTokenResponse m_AccessTokenResponse;
+    public Twitter.RequestTokenResponse m_RequestTokenResponse;
+    public Twitter.AccessTokenResponse m_AccessTokenResponse;
 
     const string PLAYER_PREFS_TWITTER_USER_ID = "TwitterUserID";
     const string PLAYER_PREFS_TWITTER_USER_SCREEN_NAME = "TwitterUserScreenName";
@@ -29,7 +28,6 @@ public class TwitterComponentHandler : MonoBehaviour
     // Use this for initialization
     void Start()
     {
-        IsStart = false;
     }
 
     // Update is called once per frame
@@ -40,14 +38,14 @@ public class TwitterComponentHandler : MonoBehaviour
 
     public void OnClickSerchByHashTag()
     {
-        if (IsStart)
+        if (condition == 2)
         {
             // ハッシュタグ "#Unity" で検索（終了するとOnSearchTweetsResponseが実行される）
             StartCoroutine(Twitter.API.SearchTweets(SearchTag, CONSUMER_KEY, CONSUMER_SECRET, m_AccessTokenResponse, OnSearchTweetsResponse));
         }
     }
 
-    void OnSearchTweetsResponse(bool success, string response)
+    public void OnSearchTweetsResponse(bool success, string response)
     {
         // responseに検索結果のJSON文字列が入ってくるので解析して各ツイートのテキストを得る
         if (success)
@@ -75,36 +73,52 @@ public class TwitterComponentHandler : MonoBehaviour
         }
     }
 
+    public float GetTweetCount()
+    {
+        return (TweetCount);
+    }
+
     /* OnClick Event */
 
 
     public void OnClickGetPINButon()
     {
-        StartCoroutine(Twitter.API.GetRequestToken(CONSUMER_KEY, CONSUMER_SECRET,
-            new Twitter.RequestTokenCallback(this.OnRequestTokenCallback)));
-        IsStart = true;
+        print("Get PIN...");
+        if (condition == 0)
+        {            
+            StartCoroutine(Twitter.API.GetRequestToken(CONSUMER_KEY, CONSUMER_SECRET,
+                new Twitter.RequestTokenCallback(this.OnRequestTokenCallback)));
+            condition = 1;
+        }
     }
 
     public void OnClickAuthPINButon()
     {
-        string myPIN = inputPINField.GetComponent<InputField>().text;
+        if (condition == 1)
+        {
+            string myPIN = inputPINField.GetComponent<InputField>().text;
 
-        StartCoroutine(Twitter.API.GetAccessToken(CONSUMER_KEY, CONSUMER_SECRET, m_RequestTokenResponse.Token, myPIN,
-            new Twitter.AccessTokenCallback(this.OnAccessTokenCallback)));
+            StartCoroutine(Twitter.API.GetAccessToken(CONSUMER_KEY, CONSUMER_SECRET, m_RequestTokenResponse.Token, myPIN,
+                new Twitter.AccessTokenCallback(this.OnAccessTokenCallback)));
+            condition = 2;
+        }
     }
 
     public void OnClickTweetButon()
     {
-        string myTweet = inputTweetField.GetComponent<InputField>().text;
+        if (condition == 2)
+        {
+            string myTweet = inputTweetField.GetComponent<InputField>().text;
 
-        StartCoroutine(Twitter.API.PostTweet(myTweet, CONSUMER_KEY, CONSUMER_SECRET, m_AccessTokenResponse,
-            new Twitter.PostTweetCallback(this.OnPostTweet)));
+            StartCoroutine(Twitter.API.PostTweet(myTweet, CONSUMER_KEY, CONSUMER_SECRET, m_AccessTokenResponse,
+                new Twitter.PostTweetCallback(this.OnPostTweet)));
+        }
     }
 
     /* Callback Event */
 
 
-    void OnRequestTokenCallback(bool success, Twitter.RequestTokenResponse response)
+    public void OnRequestTokenCallback(bool success, Twitter.RequestTokenResponse response)
     {
         if (success)
         {
@@ -126,7 +140,7 @@ public class TwitterComponentHandler : MonoBehaviour
         }
     }
 
-    void OnAccessTokenCallback(bool success, Twitter.AccessTokenResponse response)
+    public void OnAccessTokenCallback(bool success, Twitter.AccessTokenResponse response)
     {
         if (success)
         {
@@ -151,7 +165,7 @@ public class TwitterComponentHandler : MonoBehaviour
         }
     }
 
-    void OnPostTweet(bool success)
+    public void OnPostTweet(bool success)
     {
         print("OnPostTweet - " + (success ? "succedded." : "failed."));
     }
