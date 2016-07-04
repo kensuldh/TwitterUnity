@@ -10,6 +10,7 @@ public class TwitterComponentHandler : MonoBehaviour
     public GameObject Text;
     private float TweetCount = 0.0f;
     public string SearchTag;
+    public bool IsSearch;
 
     private string CONSUMER_KEY = "PUhRhZcpxbcpd2eUWgjdvxb1N";
     private string CONSUMER_SECRET = "qb3JPFWXCfEWSM8EVFHbrZHnaDCEOx84YptoXNhsCrTpNDeVES";
@@ -28,6 +29,7 @@ public class TwitterComponentHandler : MonoBehaviour
     // Use this for initialization
     void Start()
     {
+        IsSearch = false;
     }
 
     // Update is called once per frame
@@ -66,16 +68,24 @@ public class TwitterComponentHandler : MonoBehaviour
                                     }
                                     */
             Text.GetComponent<Text>().text = response;
+            IsSearch = true;
         }
         else
         {
             print("OnSearchTweet - failed.");
+            IsSearch = false;
+            
         }
+    }
+
+    public bool GetSearch()
+    {
+        return IsSearch;
     }
 
     public float GetTweetCount()
     {
-        return (TweetCount);
+        return TweetCount;
     }
 
     /* OnClick Event */

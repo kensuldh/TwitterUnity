@@ -7,7 +7,10 @@ public class ObjectMecanim : MonoBehaviour {
     TwitterComponentHandler Result = new TwitterComponentHandler();
     public GameObject inputPINField;
     public Rigidbody2D Star;
+    public Vector2 Origin = new Vector2();
     bool success;
+    public float TimeOut;
+    private float TimeElapsed;
     Twitter.RequestTokenResponse response;
     private string CONSUMER_KEY = "PUhRhZcpxbcpd2eUWgjdvxb1N";
     private string CONSUMER_SECRET = "qb3JPFWXCfEWSM8EVFHbrZHnaDCEOx84YptoXNhsCrTpNDeVES";
@@ -17,6 +20,7 @@ public class ObjectMecanim : MonoBehaviour {
     // Use this for initialization
     void Start () {
         condition = 0;
+        TimeElapsed = 0.0f;
         StartCoroutine(Twitter.API.GetRequestToken(CONSUMER_KEY, CONSUMER_SECRET,
                 new Twitter.RequestTokenCallback(Result.OnRequestTokenCallback)));
         condition = 1;
@@ -36,18 +40,32 @@ public class ObjectMecanim : MonoBehaviour {
 
     // Update is called once per frame
     void Update () {
-        if (condition == 2)
+        TimeElapsed += Time.deltaTime;
+        if (TimeElapsed >= TimeOut)
         {
-            StartCoroutine(Twitter.API.SearchTweets(SearchTag, CONSUMER_KEY, CONSUMER_SECRET, Result.m_AccessTokenResponse, Result.OnSearchTweetsResponse));
-            if (Result.GetTweetCount() > 0)
+            if (condition == 2)
             {
-                Star.AddForce(new Vector2(-10.0f, -5.0f));
-                print("Gets");
-            }else
-            {
-                Star.MovePosition(Origin);
+                StartCoroutine(Twitter.API.SearchTweets(SearchTag, CONSUMER_KEY, CONSUMER_SECRET, Result.m_AccessTokenResponse, Result.OnSearchTweetsResponse));
+
+                if (Result.GetSearch())
+                {
+                    if (Result.GetTweetCount() > 0)
+                    {
+                        Star.AddForce(new Vector2(-2.0f, -1.0f));
+                        print("Gets");
+                    }
+                    else
+                    {
+                        Star.MovePosition(Origin);
+                    }
+                    print(Result.GetTweetCount());
+                }
+                else
+                {
+                    Star.MovePosition(Origin);
+                }
             }
-            print(Result.GetTweetCount());
+            TimeElapsed = 0.0f;
         }
 	}
 }
