@@ -7,7 +7,7 @@ public class TwitterComponentHandler : MonoBehaviour
 {
     public GameObject inputPINField;
     public GameObject inputTweetField;
-    public GameObject Text;
+    //public GameObject Text;
     private float TweetCount = 0.0f;
     public string SearchTag;
     public bool IsSearch;
@@ -54,10 +54,13 @@ public class TwitterComponentHandler : MonoBehaviour
         {
             print("OnSearchTweet - succedded.");
             JSONObject json = new JSONObject(response);
+            print(response);
             //JSONObject json1 = json[0];
             JSONObject statuses = json.GetField("statuses");
             JSONObject search_metadata = json.GetField("search_metadata");
             JSONObject count = search_metadata.GetField("count");
+            string TweetText = statuses[0].GetField("text").str;
+            print(TweetText);
             TweetCount = count.n;
             print(statuses.Count); //取得ツイート数
                                     /*
@@ -67,7 +70,7 @@ public class TwitterComponentHandler : MonoBehaviour
                                         print(tweets[i].GetField("created_at").toString()); //ツイート時間
                                     }
                                     */
-            Text.GetComponent<Text>().text = response;
+            //Text.GetComponent<Text>().text = ;
             IsSearch = true;
         }
         else

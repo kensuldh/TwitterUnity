@@ -6,6 +6,7 @@ public class ObjectMecanim : MonoBehaviour {
 
     TwitterComponentHandler Result = new TwitterComponentHandler();
     public GameObject inputPINField;
+    public GameObject TweetResulut;
     public Rigidbody2D Star;
     public Vector2 Origin = new Vector2();
     bool success;
