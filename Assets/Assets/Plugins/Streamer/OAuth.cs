@@ -153,8 +153,8 @@ namespace Streamer
             }
             else
             {
-                token = "";
-                tokenSecret = "";
+                token = "353684623-PCGotpXstvhmaHEYBPsEpagmf0cKigfkJP560bmW";
+                tokenSecret = "T8VPkk1bygJ6eRkZ5UcKamzPQKR9n1kYL5ZWvslpFZPFd";
                 _status = OAuthStatus.Unauthorised;
             }
         }

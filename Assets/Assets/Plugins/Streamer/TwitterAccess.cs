@@ -137,7 +137,8 @@ namespace Streamer
 		
 		public void GetOAuthURL( Action<string> receiveUrlCallback )
 		{
-			oAuth.StartOAuthRequest ( "https://api.twitter.com/oauth/request_token", "https://api.twitter.com/oauth/authorize", receiveUrlCallback );
+			//oAuth.StartOAuthRequest ( "https://api.twitter.com/oauth/request_token", "https://api.twitter.com/oauth/authorize", receiveUrlCallback );
+            oAuth.StartOAuthRequest ("https://api.twitter.com/1.1/", "https://api.twitter.com/oauth/authorize", receiveUrlCallback );
 		}
 		
 		/// <summary>
